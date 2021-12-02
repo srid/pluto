@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE GADTs             #-}
+{-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RankNTypes        #-}
 {-# LANGUAGE TypeApplications  #-}
@@ -7,6 +8,7 @@
 module PlutusCore.Assembler.Evaluate
   ( eval
   , evalToplevelBinding
+  , evalToplevelBindingToHaskellValueMust
   ) where
 
 import           Control.Monad.Except
@@ -26,6 +28,19 @@ import qualified UntypedPlutusCore.Evaluation.Machine.Cek as UPLC
 
 eval :: Script -> Either Scripts.ScriptError (ExBudget, [Text], Term Name DefaultUni DefaultFun ())
 eval = evaluateScript @(Either Scripts.ScriptError)
+
+evalToplevelBindingToHaskellValueMust :: Build.FromUPLC a => AST.Name -> [AST.Term ()] -> AST.Program () -> a
+evalToplevelBindingToHaskellValueMust name args prog =
+  processResult $ evalToplevelBinding name args prog
+  where
+    processResult :: (Build.FromUPLC a, HasCallStack) => Either Error (Term Name DefaultUni DefaultFun ()) -> a
+    processResult = \case
+      Left err ->
+        error $ show err
+      Right t ->
+        case Build.fromUPLC t of
+          Nothing -> error "processResult: failed to convert term"
+          Just x  -> x
 
 evalToplevelBinding :: AST.Name -> [AST.Term ()] -> AST.Program () -> Either Error (Term Name DefaultUni DefaultFun ())
 evalToplevelBinding name args prog = do

@@ -15,7 +15,7 @@ module PlutusCore.Assembler.EntryPoint (main) where
 import           Data.Text                               (pack, unpack)
 import qualified Options.Applicative                     as O
 import           System.IO                               (FilePath, getContents,
-                                                          print, readFile,
+                                                          print,
                                                           writeFile)
 import           Text.Hex                                (encodeHex)
 
