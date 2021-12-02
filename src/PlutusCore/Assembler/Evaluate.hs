@@ -30,7 +30,7 @@ import qualified UntypedPlutusCore.Evaluation.Machine.Cek as UPLC
 eval :: Script -> Either Scripts.ScriptError (ExBudget, [Text], Term Name DefaultUni DefaultFun ())
 eval = evaluateScript @(Either Scripts.ScriptError)
 
--- | Like `evslTopLevelBinding`, but expects the result to be a Haskell value.
+-- | Like `evalTopLevelBinding`, but expects the result to be a Haskell value.
 evalToplevelBindingToHaskellValueMust :: (H.FromUPLC a, HasCallStack) => AST.Name -> [AST.Term ()] -> AST.Program () -> a
 evalToplevelBindingToHaskellValueMust name args prog =
   processResult $ evalToplevelBinding name args prog

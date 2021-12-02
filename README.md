@@ -218,3 +218,23 @@ To only assemble the Pluto program into a Plutus bytecode:
 ```
 cabal run pluto -- assemble examples/hello.pluto
 ```
+
+### FFI 
+
+Pluto programs can be accessed from Haskell code as follows:
+
+```haskell
+import qualified PlutusCore.Assembler.Types.AST as AST
+import PlutusCore.Assembler.FFI (plutoProgram, plutoImport)
+
+hello :: AST.Program ()
+hello = $(plutoProgram "examples/hello.pluto")
+
+$(plutoImport 'hello
+  "defaultGreeting" [t|String|])
+
+$(plutoImport 'hello
+  "greet" [t|String -> String -> String|])
+```
+
+The above exposes the two top-level bindings from the hello.pluto program.

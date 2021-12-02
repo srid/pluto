@@ -11,7 +11,7 @@ module PlutusCore.Assembler.Spec.ExamplesSpec (tests) where
 import           Data.Function
 import qualified Hedgehog.Gen                      as Gen
 import qualified Hedgehog.Range                    as Range
-import           PlutusCore.Assembler.FFI
+import PlutusCore.Assembler.FFI ( plutoProgram, plutoImport )
 import           PlutusCore.Assembler.Prelude
 import           PlutusCore.Assembler.Spec.Prelude
 import qualified PlutusCore.Assembler.Types.AST    as AST

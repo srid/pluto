@@ -4,7 +4,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies      #-}
 
--- | Functions that build and transform the Pluto AST in various ways
+-- | 
 module PlutusCore.Assembler.Haskell
   ( -- * Converting to/from Haskell types
     ToPluto(..),
