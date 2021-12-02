@@ -35,12 +35,13 @@ helloTest :: TestTree
 helloTest =
   testGroup
     "hello.pluto"
-    [ testProperty "accepts diverse greetings" . property $ do
+    [ testProperty "constructs greeting correctly regardless of input" . property $ do
         greeting <- forAll someText
         name <- forAll someText
         greet greeting name === greeting <> ", " <> name
-    , testProperty "default greeting stays" . property $ do
+    , testProperty "default greeting is Hello" . property $ do
         name <- forAll someText
+        defaultGreeting === "Hello"
         greet defaultGreeting name === "Hello" <> ", " <> name
     ]
   where

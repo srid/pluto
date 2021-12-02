@@ -14,8 +14,8 @@ import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax     (Lift (lift), dataToExpQ)
 import           PlutusCore.Assembler.App       (Error (ErrorParsing))
 import qualified PlutusCore.Assembler.Assemble  as Assemble
-import qualified PlutusCore.Assembler.Build     as B
 import qualified PlutusCore.Assembler.Evaluate  as E
+import qualified PlutusCore.Assembler.Haskell   as H
 import           PlutusCore.Assembler.Prelude
 import qualified PlutusCore.Assembler.Types.AST as AST
 import           System.IO                      (FilePath)
@@ -48,7 +48,7 @@ plutoImport prog name qType = do
         (fromString name)
         $( listE $
               flip fmap args $ \arg -> do
-                [|B.toPluto|] `appE` varE arg
+                [|H.toPluto|] `appE` varE arg
           )
         $(varE prog)
       |]
