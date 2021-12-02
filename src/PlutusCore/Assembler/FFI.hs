@@ -6,7 +6,10 @@
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE TypeApplications    #-}
 
-module PlutusCore.Assembler.FFI (plutoProgram, plutoImport) where
+module PlutusCore.Assembler.FFI
+  ( load
+  , bind
+  ) where
 
 import           Data.Data                      (Data, cast)
 import qualified Data.Text                      as T
@@ -21,8 +24,8 @@ import qualified PlutusCore.Assembler.Types.AST as AST
 import           System.IO                      (FilePath)
 
 -- | Embed the AST of a Pluto program into the current module.
-plutoProgram :: FilePath -> Q Exp
-plutoProgram =
+load :: FilePath -> Q Exp
+load =
   liftDataWithText <=< loadPlutoMod
   where
     loadPlutoMod :: (MonadIO m, MonadFail m) => FilePath -> m (AST.Program ())
@@ -31,8 +34,8 @@ plutoProgram =
       either (fail . show . ErrorParsing) (pure . void)
         $ Assemble.parseProgram fp (T.pack s)
 
--- | Import a top-level value (or function) from a Pluto program.
-plutoImport ::
+-- | Import a top-level bound value (or function) from a Pluto program.
+bind ::
   -- | The pluto program to import from
   Name ->
   -- | The variable name of the top-level binding to import.
@@ -40,7 +43,7 @@ plutoImport ::
   -- | Expected value type.
   Q Type ->
   Q [Dec]
-plutoImport prog name qType = do
+bind prog name qType = do
   type_ <- qType
   simpleD name type_ $ \args ->
     [|

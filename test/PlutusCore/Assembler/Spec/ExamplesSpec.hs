@@ -11,17 +11,17 @@ module PlutusCore.Assembler.Spec.ExamplesSpec (tests) where
 import           Data.Function
 import qualified Hedgehog.Gen                      as Gen
 import qualified Hedgehog.Range                    as Range
-import           PlutusCore.Assembler.FFI          (plutoImport, plutoProgram)
+import qualified PlutusCore.Assembler.FFI          as FFI
 import           PlutusCore.Assembler.Prelude
 import           PlutusCore.Assembler.Spec.Prelude
 import qualified PlutusCore.Assembler.Types.AST    as AST
 
 -- FFIs must be declared before tests
 hello :: AST.Program ()
-hello = $(plutoProgram "examples/hello.pluto")
-$(plutoImport 'hello
+hello = $(FFI.load "examples/hello.pluto")
+$(FFI.bind 'hello
   "defaultGreeting" [t|String|])
-$(plutoImport 'hello
+$(FFI.bind 'hello
   "greet" [t|String -> String -> String|])
 
 tests :: TestTree

@@ -225,15 +225,15 @@ Pluto programs can be accessed and evaluated (via Plutus Core) from Haskell code
 
 ```haskell
 import qualified PlutusCore.Assembler.Types.AST as AST
-import PlutusCore.Assembler.FFI (plutoProgram, plutoImport)
+import qualified PlutusCore.Assembler.FFI as FFI
 
 hello :: AST.Program ()
-hello = $(plutoProgram "examples/hello.pluto")
+hello = $(FFI.load "examples/hello.pluto")
 
-$(plutoImport 'hello
+$(FFI.bind 'hello
   "defaultGreeting" [t|String|])
 
-$(plutoImport 'hello
+$(FFI.bind 'hello
   "greet" [t|String -> String -> String|])
 ```
 
