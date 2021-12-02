@@ -1,7 +1,7 @@
-{-# LANGUAGE DeriveFunctor     #-}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveFunctor      #-}
+{-# LANGUAGE LambdaCase         #-}
+{-# LANGUAGE NoImplicitPrelude  #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
@@ -11,9 +11,9 @@ module PlutusCore.Assembler.Types.Constant
   ) where
 
 
+import           Data.Data                    (Data)
 import           PlutusCore.Assembler.Prelude
-import qualified PlutusCore.Data as PLC
-import Data.Data (Data)
+import qualified PlutusCore.Data              as PLC
 
 -- TODO: Should we upstream this? Might that affect onchain code size?
 deriving instance Data PLC.Data

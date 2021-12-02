@@ -1,12 +1,12 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE NoImplicitPrelude  #-}
 
 
 module PlutusCore.Assembler.Types.Builtin (Builtin (..)) where
 
 
+import           Data.Data                    (Data)
 import           PlutusCore.Assembler.Prelude
-import Data.Data (Data)
 
 
 data Builtin =

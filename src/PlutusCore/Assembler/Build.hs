@@ -1,8 +1,8 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies      #-}
-{-# LANGUAGE FlexibleInstances #-}
 
 -- | Functions that build and transform the Pluto AST in various ways
 module PlutusCore.Assembler.Build
@@ -16,10 +16,10 @@ module PlutusCore.Assembler.Build
 where
 
 import qualified Data.Text                      as T
+import qualified PlutusCore                     as PLC
 import           PlutusCore.Assembler.Prelude
 import           PlutusCore.Assembler.Types.AST
-import qualified UntypedPlutusCore as UPLC
-import qualified PlutusCore as PLC
+import qualified UntypedPlutusCore              as UPLC
 
 -- | Return a new program that applies a bound lambda with the given arguments
 --
@@ -57,7 +57,7 @@ applyToplevelBinding name args = \case
 class ToPluto a where
   toPluto :: a -> Term ()
 
-class FromUPLC a where 
+class FromUPLC a where
   fromUPLC :: UPLC.Term name PLC.DefaultUni fun () -> Maybe a
 
 instance ToPluto Text where
@@ -74,7 +74,7 @@ instance FromUPLC Text where
     _                                                                  -> Nothing
 
 instance FromUPLC String where
-  fromUPLC = fmap T.unpack . fromUPLC                                                        
+  fromUPLC = fmap T.unpack . fromUPLC
 
 var :: Text -> Term ()
 var s =

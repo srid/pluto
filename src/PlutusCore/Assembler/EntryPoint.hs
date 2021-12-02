@@ -1,10 +1,10 @@
 {-# LANGUAGE ApplicativeDo     #-}
-{-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes        #-}
+{-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE ViewPatterns      #-}
 -- {-# OPTIONS_GHC -ddump-splices #-}
 
@@ -24,11 +24,11 @@ import qualified Plutus.V1.Ledger.Scripts                as Scripts
 import           PlutusCore.Assembler.App
 import qualified PlutusCore.Assembler.Assemble           as Assemble
 import qualified PlutusCore.Assembler.Evaluate           as Evaluate
+import           PlutusCore.Assembler.FFI
 import           PlutusCore.Assembler.Prelude
 import qualified PlutusCore.Assembler.Types.AST          as AST
 import           PlutusCore.Assembler.Types.ErrorMessage (ErrorMessage (..))
 import qualified PlutusCore.Pretty                       as Pretty
-import PlutusCore.Assembler.FFI
 
 
 newtype InputFilePath = InputFilePath { getInputFilePath :: FilePath }

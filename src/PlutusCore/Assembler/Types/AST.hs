@@ -1,8 +1,8 @@
-{-# LANGUAGE DeriveFoldable    #-}
-{-# LANGUAGE DeriveFunctor     #-}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveFoldable     #-}
+{-# LANGUAGE DeriveFunctor      #-}
+{-# LANGUAGE LambdaCase         #-}
+{-# LANGUAGE NoImplicitPrelude  #-}
 
 
 module PlutusCore.Assembler.Types.AST
@@ -22,11 +22,11 @@ module PlutusCore.Assembler.Types.AST
   ) where
 
 
+import           Data.Data                           (Data)
 import           PlutusCore.Assembler.Prelude
 import           PlutusCore.Assembler.Types.Builtin  (Builtin)
 import           PlutusCore.Assembler.Types.Constant (Constant (..))
-import Data.Data ( Data )
-import qualified PlutusCore.Data as PLC
+import qualified PlutusCore.Data                     as PLC
 
 
 newtype Program ann = Program { unProgram :: Term ann }
