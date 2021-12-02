@@ -150,17 +150,11 @@ writeObjectCode Nothing bs =
 hello :: AST.Program ()
 hello = $(plutoProgram "examples/hello.pluto")
 
-$(plutoImport 
-  'hello
-  "greet" [t|String -> String -> String|]
- )
+$(plutoImport 'hello
+  "defaultGreeting" [t|String|])
 
-{-
-$(plutoImport 
-  'hello
-  "defaultGreeting" [t|String|]
- )
--}
+$(plutoImport 'hello
+  "greet" [t|String -> String -> String|])
 
 
 
@@ -172,4 +166,4 @@ main = do
       logError err
     Right () ->
       pure ()
-  print $ greet "hello" "sarah"
+  print $ greet defaultGreeting "sarah"

@@ -12,8 +12,7 @@ module PlutusCore.Assembler.FFI (plutoProgram, plutoImport, processResult) where
 import Language.Haskell.TH
 import PlutusCore.Assembler.Prelude
 import System.IO (FilePath, putStrLn)
-import Debug.Trace (traceShowId)
-import Prelude (error, readFile, MonadFail (fail))
+import Prelude (error, readFile, MonadFail (fail), Foldable (null), flip)
 import qualified PlutusCore.Assembler.Assemble as Assemble
 import qualified Data.Text as T
 import PlutusCore.Assembler.App
@@ -25,29 +24,38 @@ import qualified PlutusCore.Assembler.Build as B
 import qualified UntypedPlutusCore as UPLC
 import qualified PlutusCore as PLC
 
+-- | Embed the AST of a Pluto program into the current module.
 plutoProgram :: FilePath -> Q Exp
 plutoProgram fp = do
   plutoProg <- loadPlutoMod fp 
   liftDataWithText plutoProg
--- TODO: 
--- - [ ] Parse decl AST
--- - [ ] Generate eval body
-plutoImport :: Name -> String -> Q Type -> Q [Dec]
+
+-- | Import a top-level value (or function) from a Pluto program.
+plutoImport :: 
+  -- | The pluto program to import from
+  Name -> 
+  -- | The variable name of the top-level binding to import.
+  String -> 
+  -- | Expected value type.
+  Q Type 
+  -> Q [Dec]
 plutoImport prog name qType = do 
-  -- define the function
   type_ <- qType
   args <- lambdaArgsFromType type_
   liftIO $ putStrLn "plutoImport: doing stuff"
-  let sig = SigD (mkName $ traceShowId name) (AppT (AppT ArrowT (ConT ''String)) (AppT (AppT ArrowT (ConT ''String)) (ConT ''String)))
+  -- bFn <- [|AST.Name name|]
+  args' <- listE $ flip fmap args $ \arg -> do
+    [|B.toPluto|] `appE` (pure $ VarE arg)
+  x <- [|E.evalToplevelBinding (fromString name) $(pure args') $(varE prog)|]
+  let sig = 
+        SigD (mkName name) type_
       body = 
         let 
-          bFn = AppE (ConE 'AST.Name) (LitE (StringL name))
-          bArgs = ListE $ (\arg -> VarE 'B.toPluto `AppE` VarE arg) <$> args
-          bProg = VarE prog
-          bCall = AppE (VarE 'E.evalToplevelBinding) bFn `AppE` bArgs `AppE` bProg
-          bRes = (VarE 'processResult) `AppE` bCall
+          bRes = VarE 'processResult `AppE` x
         in bRes
-      fun = FunD (mkName name) [Clause (VarP <$> args) (NormalB body) []]
+      fun = if null args 
+        then ValD (VarP (mkName name)) (NormalB body) []
+        else FunD (mkName name) [Clause (VarP <$> args) (NormalB body) []]
   -- pure [psig, pfun, sig, fun]
   pure [sig, fun]
 

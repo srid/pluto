@@ -156,6 +156,8 @@ test-suite spec
     cardano-api -any,
     serialise -any,
     cardano-ledger-alonzo -any,
+    template-haskell,
+    shower,
 
     pluto
 
