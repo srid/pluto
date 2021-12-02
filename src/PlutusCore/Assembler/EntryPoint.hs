@@ -1,10 +1,12 @@
 {-# LANGUAGE ApplicativeDo     #-}
+{-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes        #-}
 {-# LANGUAGE ViewPatterns      #-}
+-- {-# OPTIONS_GHC -ddump-splices #-}
 
 
 module PlutusCore.Assembler.EntryPoint (main) where
@@ -26,6 +28,7 @@ import           PlutusCore.Assembler.Prelude
 import qualified PlutusCore.Assembler.Types.AST          as AST
 import           PlutusCore.Assembler.Types.ErrorMessage (ErrorMessage (..))
 import qualified PlutusCore.Pretty                       as Pretty
+import PlutusCore.Assembler.FFI
 
 
 newtype InputFilePath = InputFilePath { getInputFilePath :: FilePath }
@@ -144,6 +147,22 @@ writeObjectCode (Just (OutputFilePath path)) bs =
 writeObjectCode Nothing bs =
   logInfo $ encodeHex bs
 
+hello :: AST.Program ()
+hello = $(plutoProgram "examples/hello.pluto")
+
+$(plutoImport 
+  'hello
+  "greet" [t|String -> String -> String|]
+ )
+
+{-
+$(plutoImport 
+  'hello
+  "defaultGreeting" [t|String|]
+ )
+-}
+
+
 
 main :: IO ()
 main = do
@@ -153,3 +172,4 @@ main = do
       logError err
     Right () ->
       pure ()
+  print $ greet "hello" "sarah"

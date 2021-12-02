@@ -1,10 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 
 
 module PlutusCore.Assembler.Types.Builtin (Builtin (..)) where
 
 
 import           PlutusCore.Assembler.Prelude
+import Data.Data (Data)
 
 
 data Builtin =
@@ -57,4 +59,4 @@ data Builtin =
   | MkPairData
   | MkNilData
   | MkNilPairData
-  deriving (Eq, Show, Bounded, Enum)
+  deriving (Eq, Show, Data, Bounded, Enum)

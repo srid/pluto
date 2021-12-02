@@ -1,6 +1,9 @@
 {-# LANGUAGE DeriveFunctor     #-}
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 
 
 module PlutusCore.Assembler.Types.Constant
@@ -9,8 +12,11 @@ module PlutusCore.Assembler.Types.Constant
 
 
 import           PlutusCore.Assembler.Prelude
-import           PlutusCore.Data              (Data)
+import qualified PlutusCore.Data as PLC
+import Data.Data (Data)
 
+-- TODO: Should we upstream this? Might that affect onchain code size?
+deriving instance Data PLC.Data
 
 data Constant ann =
     I ann Integer
@@ -18,8 +24,8 @@ data Constant ann =
   | T ann Text
   | U ann
   | B ann Bool
-  | D ann Data
-  deriving (Eq, Show, Functor)
+  | D ann PLC.Data
+  deriving (Eq, Show, Data, Functor)
 
 instance Foldable Constant where
   foldMap f =
