@@ -4,9 +4,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes        #-}
-{-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE ViewPatterns      #-}
--- {-# OPTIONS_GHC -ddump-splices #-}
 
 
 module PlutusCore.Assembler.EntryPoint (main) where
@@ -15,8 +13,7 @@ module PlutusCore.Assembler.EntryPoint (main) where
 import           Data.Text                               (pack, unpack)
 import qualified Options.Applicative                     as O
 import           System.IO                               (FilePath, getContents,
-                                                          print,
-                                                          writeFile)
+                                                          print, writeFile)
 import           Text.Hex                                (encodeHex)
 
 import qualified Data.Text                               as T
@@ -24,7 +21,6 @@ import qualified Plutus.V1.Ledger.Scripts                as Scripts
 import           PlutusCore.Assembler.App
 import qualified PlutusCore.Assembler.Assemble           as Assemble
 import qualified PlutusCore.Assembler.Evaluate           as Evaluate
-import           PlutusCore.Assembler.FFI
 import           PlutusCore.Assembler.Prelude
 import qualified PlutusCore.Assembler.Types.AST          as AST
 import           PlutusCore.Assembler.Types.ErrorMessage (ErrorMessage (..))
@@ -32,7 +28,6 @@ import qualified PlutusCore.Pretty                       as Pretty
 
 
 newtype InputFilePath = InputFilePath { getInputFilePath :: FilePath }
-
 
 newtype OutputFilePath = OutputFilePath { _getOutputFilePath :: FilePath }
 
@@ -147,16 +142,6 @@ writeObjectCode (Just (OutputFilePath path)) bs =
 writeObjectCode Nothing bs =
   logInfo $ encodeHex bs
 
-hello :: AST.Program ()
-hello = $(plutoProgram "examples/hello.pluto")
-
-$(plutoImport 'hello
-  "defaultGreeting" [t|String|])
-
-$(plutoImport 'hello
-  "greet" [t|String -> String -> String|])
-
-
 
 main :: IO ()
 main = do
@@ -166,4 +151,3 @@ main = do
       logError err
     Right () ->
       pure ()
-  print $ greet defaultGreeting "sarah"

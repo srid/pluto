@@ -6,7 +6,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell     #-}
 
-module PlutusCore.Assembler.Spec.ExamplesSpec (tests, sayHello) where
+module PlutusCore.Assembler.Spec.ExamplesSpec (tests) where
 
 import           Data.Function
 import qualified Hedgehog.Gen                      as Gen
@@ -16,20 +16,13 @@ import           PlutusCore.Assembler.Prelude
 import           PlutusCore.Assembler.Spec.Prelude
 import qualified PlutusCore.Assembler.Types.AST    as AST
 
+-- FFIs must be declared before tests
 hello :: AST.Program ()
 hello = $(plutoProgram "examples/hello.pluto")
-
 $(plutoImport 'hello
   "defaultGreeting" [t|String|])
-
 $(plutoImport 'hello
   "greet" [t|String -> String -> String|])
-
--- | Say hello to someone.
---
--- > sayHello "Hosky" -- "Hello, Hosky"
-sayHello :: String -> String
-sayHello = greet defaultGreeting
 
 tests :: TestTree
 tests =

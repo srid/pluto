@@ -12,7 +12,7 @@ import           Data.Data                      (Data, cast)
 import qualified Data.Text                      as T
 import           Language.Haskell.TH
 import           Language.Haskell.TH.Syntax     (Lift (lift), dataToExpQ)
-import           PlutusCore.Assembler.App
+import           PlutusCore.Assembler.App       (Error (ErrorParsing))
 import qualified PlutusCore.Assembler.Assemble  as Assemble
 import qualified PlutusCore.Assembler.Build     as B
 import qualified PlutusCore.Assembler.Evaluate  as E
@@ -28,7 +28,8 @@ plutoProgram =
     loadPlutoMod :: (MonadIO m, MonadFail m) => FilePath -> m (AST.Program ())
     loadPlutoMod fp = do
       s <- liftIO $ readFile fp
-      either (fail . show . ErrorParsing) (pure . void) $ Assemble.parseProgram "<TH>" (T.pack s)
+      either (fail . show . ErrorParsing) (pure . void)
+        $ Assemble.parseProgram fp (T.pack s)
 
 -- | Import a top-level value (or function) from a Pluto program.
 plutoImport ::
@@ -41,7 +42,7 @@ plutoImport ::
   Q [Dec]
 plutoImport prog name qType = do
   type_ <- qType
-  functionD name type_ $ \args ->
+  simpleD name type_ $ \args ->
     [|
       E.evalToplevelBindingToHaskellValueMust
         (fromString name)
@@ -52,19 +53,28 @@ plutoImport prog name qType = do
         $(varE prog)
       |]
 
--- | A simple function (or value) declaration
+-- TH Utilities
+
+-- | A simple value or function declaration
 --
--- Type must be a simple type or a function (arrow) type.
-functionD :: String -> Type -> ([Name] -> Q Exp) -> Q [Dec]
-functionD name type_ bodyF = do
+-- Type must be a simple type or an arrow type.
+simpleD ::
+  -- | The name of the declaration
+  String ->
+  -- | The type of the declaration
+  Type ->
+  -- | The body of the declaration, as a function taking the arguments if any
+  ([Name] -> Q Exp) ->
+  Q [Dec]
+simpleD name type_ bodyF = do
   args <- lambdaArgsFromType type_
-  body <- bodyF args
+  body <- NormalB <$> bodyF args
   let sym = mkName name
   pure
     [ SigD sym type_,
       if null args
-        then ValD (VarP sym) (NormalB body) []
-        else FunD sym [Clause (VarP <$> args) (NormalB body) []]
+        then ValD (VarP sym) body []
+        else FunD sym [Clause (VarP <$> args) body []]
     ]
   where
     lambdaArgsFromType :: Type -> Q [Name]
@@ -75,12 +85,14 @@ functionD name type_ bodyF = do
         n <- newName "_arg"
         (n :) <$> lambdaArgsFromType rest
       _ ->
-        error "functionD: not a valid type"
+        fail "simpleD: unexpected type"
 
--- Why? See https://gitlab.haskell.org/ghc/ghc/-/issues/12596#note_169275
-
-liftText :: T.Text -> Q Exp
-liftText txt = AppE (VarE 'T.pack) <$> lift (T.unpack txt)
-
+-- | Like `liftData` but `Data.Text`-friendly.
+--
+-- See https://gitlab.haskell.org/ghc/ghc/-/issues/12596#note_169275
 liftDataWithText :: Data a => a -> Q Exp
-liftDataWithText = dataToExpQ (\a -> liftText <$> cast a)
+liftDataWithText =
+  dataToExpQ (fmap liftText . cast)
+  where
+    liftText :: T.Text -> Q Exp
+    liftText txt = AppE (VarE 'T.pack) <$> lift (T.unpack txt)
