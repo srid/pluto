@@ -4,7 +4,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies      #-}
 
--- | 
+-- |
 module PlutusCore.Assembler.Haskell
   ( -- * Converting to/from Haskell types
     ToPluto(..),
